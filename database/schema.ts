@@ -62,9 +62,10 @@ export const verificationTokens = mysqlTable(
 )
 
 export const products = mysqlTable("product", {
-    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    id: varchar("id", { length: 255 }).default(crypto.randomUUID()).notNull().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 5 }).notNull(),
     description: varchar("description", { length: 255 }),
     images: json("images"),
     customFields: json("customFields"),

@@ -2,11 +2,17 @@
 import { Button } from "@/components/ui/button";
 import {
   CircleBackslashIcon,
-  CrossCircledIcon,
   ImageIcon,
   TrashIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
@@ -24,15 +30,16 @@ import { Input } from "@/components/ui/input";
 import { useDropzone } from "react-dropzone";
 import { useCallback, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  deleteImageFromCloudinary,
-  uploadImageToCloudinary,
-  validateImages,
-} from "@/lib/cloudinary";
+import { uploadImageToCloudinary, validateImages } from "@/lib/cloudinary";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { publishProduct } from "./actions";
+import { Product } from "@/database/types";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
+import { currencyArray } from "@/lib/currency";
 
 const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
 const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -40,9 +47,10 @@ const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 const productSchema = z.object({
   name: z.string(),
   description: z.string(),
-  price: z.number(),
+  price: z.coerce.number(),
   customFields: z.record(z.string()),
-  stock: z.number(),
+  stock: z.coerce.number(),
+  currency: z.string(),
 });
 
 interface uploadedFile {
@@ -53,6 +61,7 @@ interface uploadedFile {
 }
 
 export default function CreateProductPage() {
+  const router = useRouter();
   const [uploadedFiles, setUploadedFiles] = useState<uploadedFile[]>([]);
 
   const handleImageUpload = async (image: File, index: number) => {
@@ -146,13 +155,36 @@ export default function CreateProductPage() {
       price: 0,
       customFields: {},
       stock: 0,
+      currency: "eur",
     },
   });
 
-  function onSubmit(values: z.infer<typeof productSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof productSchema>) {
+    const toastId = toast.loading("Publishing product...");
+    const product: Product = {
+      images: uploadedFiles,
+      name: values.name,
+      price: values.price.toString(),
+      currency: values.currency,
+      id: uuidv4(),
+      description: values.description,
+      customFields: values.customFields,
+      stock: values.stock,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const result = await publishProduct(product);
+
+    if (!result.success) {
+      toast.error("Failed to publish product");
+      return;
+    }
+
+    toast.success("Product published successfully", {
+      id: toastId,
+      duration: 1000,
+      onAutoClose: () => router.push("/products"),
+    });
   }
 
   return (
@@ -327,28 +359,58 @@ export default function CreateProductPage() {
                   </div>
 
                   <div className="sm:col-span-3">
-                    <FormField
-                      control={form.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Price per unit</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            Price of a single unit of the product.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-4 gap-2">
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <FormItem className="col-span-3">
+                            <FormLabel>Price per unit</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Price of a single unit of the product.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="currency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="opacity-0">
+                              Currency
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Currency" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {currencyArray.map((currency, index) => (
+                                  <SelectItem key={index} value={currency.code}>
+                                    {currency.code.toUpperCase()}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
 
                   <div className="sm:col-span-3">
                     <FormField
                       control={form.control}
-                      name="price"
+                      name="stock"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Stock</FormLabel>

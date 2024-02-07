@@ -4,27 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Product } from "@/database/types";
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-
-async function getData(): Promise<Product[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      name: "Product 1",
-      description: "Description of product 1",
-      images: JSON.stringify(["/images/product-1.jpg"]),
-      customFields: JSON.stringify({}),
-      price: "100",
-      stock: 10,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    // ...
-  ];
-}
+import { getProducts } from "./actions";
 
 export default async function ProductsPage() {
-  const products = await getData();
+  const products = await getProducts();
   return (
     <div className="space-y-12">
       <div className="flex items-center justify-between py-5 border-b">
