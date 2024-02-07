@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +12,19 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DefaultSession, getServerSession } from "next-auth";
+import { DefaultSession } from "next-auth";
+import {
+  signOut,
+} from "next-auth/react";
 
 export async function UserNav({ session }: { session: DefaultSession }) {
+  const handleSignOut = () => {
+    signOut({
+      redirect: true,
+      callbackUrl: "/signin",
+    });
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -48,7 +60,7 @@ export async function UserNav({ session }: { session: DefaultSession }) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>

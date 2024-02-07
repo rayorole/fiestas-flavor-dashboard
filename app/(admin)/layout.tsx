@@ -18,20 +18,20 @@ export default async function Layout({
   return (
     <>
       <div className="md:hidden">
-        <Image
-          src="/examples/dashboard-light.png"
+        {/* <Image
+          src="/"
           width={1280}
           height={866}
           alt="Dashboard"
           className="block dark:hidden"
         />
         <Image
-          src="/examples/dashboard-dark.png"
+          src="/"
           width={1280}
           height={866}
           alt="Dashboard"
           className="hidden dark:block"
-        />
+        /> */}
       </div>
       <div className="hidden flex-col md:flex">
         <div className="border-b">
