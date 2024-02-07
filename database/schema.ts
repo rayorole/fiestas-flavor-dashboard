@@ -4,6 +4,8 @@ import {
     mysqlTable,
     primaryKey,
     varchar,
+    decimal,
+    json,
 } from "drizzle-orm/mysql-core"
 import type { AdapterAccount } from "@auth/core/adapters"
 
@@ -58,3 +60,16 @@ export const verificationTokens = mysqlTable(
         compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
     })
 )
+
+export const products = mysqlTable("product", {
+    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    description: varchar("description", { length: 255 }),
+    images: json("images"),
+    customFields: json("customFields"),
+    stock: int("stock").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date", fsp: 3 }).defaultNow(),
+    updatedAt: timestamp("updatedAt", { mode: "date", fsp: 3 }).defaultNow(),
+});
+
