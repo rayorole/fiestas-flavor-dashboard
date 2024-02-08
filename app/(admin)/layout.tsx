@@ -1,5 +1,5 @@
 import Image from "next/image";
-import TeamSwitcher from "@/components/shared/team-switcher";
+import NavLogo from "@/components/shared/nav-logo";
 import { MainNav } from "@/components/shared/main-nav";
 import { UserNav } from "@/components/shared/user-nav";
 import { getServerSession } from "next-auth";
@@ -17,27 +17,11 @@ export default async function Layout({
 
   return (
     <>
-      <div className="md:hidden">
-        {/* <Image
-          src="/"
-          width={1280}
-          height={866}
-          alt="Dashboard"
-          className="block dark:hidden"
-        />
-        <Image
-          src="/"
-          width={1280}
-          height={866}
-          alt="Dashboard"
-          className="hidden dark:block"
-        /> */}
-      </div>
       <div className="hidden flex-col md:flex">
         <div className="border-b">
-          <div className="flex h-16 items-center px-4">
-            <TeamSwitcher />
-            <MainNav className="mx-6" />
+          <div className="flex h-16 items-center px-4 space-x-8">
+            <NavLogo />
+            <MainNav />
             <div className="ml-auto flex items-center space-x-4">
               <ThemeToggle />
               <UserNav session={session} />
