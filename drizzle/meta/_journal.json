@@ -8,6 +8,27 @@
       "when": 1707251246075,
       "tag": "0000_colossal_sunspot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1707415070593,
+      "tag": "0001_dear_banshee",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1707415848904,
+      "tag": "0002_hot_roxanne_simpson",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1707419500006,
+      "tag": "0003_certain_shooting_star",
+      "breakpoints": true
     }
   ]
 }

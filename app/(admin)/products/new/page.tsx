@@ -40,6 +40,7 @@ import { Product } from "@/database/types";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { currencyArray } from "@/lib/currency";
+import { generateSlug } from "@/lib/slug";
 
 const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
 const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -91,11 +92,11 @@ export default function CreateProductPage() {
           prev.map((file, i) =>
             i === index
               ? {
-                loading: false,
-                file_path: data.secure_url,
-                public_id: data.public_id,
-                sizeMb: Math.round((image.size / 1024 / 1024) * 100) / 100,
-              }
+                  loading: false,
+                  file_path: data.secure_url,
+                  public_id: data.public_id,
+                  sizeMb: Math.round((image.size / 1024 / 1024) * 100) / 100,
+                }
               : file
           )
         );
@@ -164,6 +165,7 @@ export default function CreateProductPage() {
     const product: Product = {
       images: uploadedFiles,
       name: values.name,
+      slug: generateSlug(values.name),
       price: values.price.toString(),
       currency: values.currency,
       id: uuidv4(),

@@ -1,0 +1,1 @@
+ALTER TABLE `product` MODIFY COLUMN `id` varchar(255) NOT NULL;
