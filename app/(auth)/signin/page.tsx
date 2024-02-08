@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -16,6 +16,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useState } from "react";
+import { PulseLoader } from "react-spinners";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { CheckCircledIcon } from "@radix-ui/react-icons";
+
+
 
 const formSchema = z.object({
   email: z.string().min(2, {
@@ -24,6 +40,8 @@ const formSchema = z.object({
 });
 
 export default function Signin() {
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,14 +50,25 @@ export default function Signin() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
-    signIn("email", {
+    setLoading(true)
+    const result = await signIn("email", {
       email: values.email,
       redirect: false,
     });
+
+    if (result?.error) {
+      set(form.formState.errors, "email", {
+        type: "manual",
+        message: "An error occurred. Please try again.",
+      });
+    } else {
+      setSuccess(true)
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -168,14 +197,47 @@ export default function Signin() {
                   </Link>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Sign in
+                <Button type="submit" className="w-full space-x-1" disabled={loading}>
+                  <p>Sign in</p> {
+                    loading && (
+                      <div>
+                        <div className="block dark:hidden">
+                          <PulseLoader color="#fff" size={6} margin={2} />
+                        </div>
+
+                        <div className="hidden dark:block">
+                          <PulseLoader color="#000" size={6} margin={2} />
+                        </div>
+                      </div>
+                    )
+                  }
                 </Button>
               </form>
             </Form>
           </div>
         </div>
       </section>
+
+
+
+      <AlertDialog open={success}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center">
+              <CheckCircledIcon className="w-6 h-6 mr-2" />
+              <span>Email sent!</span>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              An email has been sent to you with a link to sign in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setSuccess(!success)
+            }}>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

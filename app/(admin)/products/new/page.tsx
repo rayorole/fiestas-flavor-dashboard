@@ -91,11 +91,11 @@ export default function CreateProductPage() {
           prev.map((file, i) =>
             i === index
               ? {
-                  loading: false,
-                  file_path: data.secure_url,
-                  public_id: data.public_id,
-                  sizeMb: Math.round((image.size / 1024 / 1024) * 100) / 100,
-                }
+                loading: false,
+                file_path: data.secure_url,
+                public_id: data.public_id,
+                sizeMb: Math.round((image.size / 1024 / 1024) * 100) / 100,
+              }
               : file
           )
         );
@@ -183,7 +183,7 @@ export default function CreateProductPage() {
     toast.success("Product published successfully", {
       id: toastId,
       duration: 1000,
-      onAutoClose: () => router.push("/products"),
+      onAutoClose: () => window.location.replace("/products"),
     });
   }
 
